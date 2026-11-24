@@ -177,7 +177,7 @@ export default function Sequence({ children }) {
       },
       onTick: (p) => {
         seq.p = p;
-        engine.rate = 42; // follows the native scroll almost at once: only enough easing to smooth out coarse mouse-wheel steps
+        engine.rate = 20; // a short glide (about 0.15 s) that smooths mouse-wheel steps and settles quickly once the page stops
         if (heroPhoto.current && p < 0.07) {
           heroPhoto.current.style.translate = `${(-pointer.x * 14).toFixed(1)}px ${(pointer.y * 8).toFixed(1)}px`;
         }
