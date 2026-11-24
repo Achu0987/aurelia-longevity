@@ -18,7 +18,7 @@ export default function SmoothScroll() {
     let lenis = null;
     let tick = null;
     if (!reduce && !navigator.webdriver) {
-      lenis = new Lenis({ lerp: 0.13, smoothWheel: true, wheelMultiplier: 1 });
+      lenis = new Lenis({ lerp: 0.2, smoothWheel: true, wheelMultiplier: 1 });
       seq.lenis = lenis;
       lenis.on("scroll", ScrollTrigger.update);
       tick = (t) => lenis.raf(t * 1000);

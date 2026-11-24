@@ -257,9 +257,8 @@ export class FrameEngine {
       }
     }
 
-    // once the scroll has rested briefly, settle on the nearest whole frame so the still picture is crisp, never a blend of two
-    const resting = !this.reduced && performance.now() - (this.movedAt || 0) > 140;
-    const goal = resting ? Math.round(this.target) : this.target;
+    // the picture stops exactly where the scroll stops: no settling move afterwards
+    const goal = this.target;
     const diff = goal - this.display;
     if (Math.abs(diff) > 0.003) {
       this.dir = diff > 0 ? 1 : -1;
@@ -279,7 +278,7 @@ export class FrameEngine {
     }
 
     if (this.dirty || Math.abs(pos - this.drawnPos) > 0.004) {
-      const want = frac > 0.7 ? hi : lo;
+      const want = frac > 0.65 ? hi : lo;
       const base = this.nearest(want);
       if (base >= 0 && (this.hasDrawn || base === want) && Math.abs(base - want) <= 4) {
         // two neighbouring frames blended by the fractional position: motion stays continuous between the 240 stills
@@ -287,7 +286,7 @@ export class FrameEngine {
         this.ctx.drawImage(this.bitmaps.get(base), 0, 0);
         const top = this.bitmaps.get(hi);
         // the blend happens only in the middle of the step, so a resting picture is one clean frame, never a double image
-        const mix = Math.min(1, Math.max(0, (frac - 0.3) / 0.4));
+        const mix = Math.min(1, Math.max(0, (frac - 0.35) / 0.3));
         const blend = mix * mix * (3 - 2 * mix);
         if (want === lo && base === lo && hi !== lo && blend > 0.01 && top) {
           this.ctx.globalAlpha = blend;
