@@ -218,7 +218,9 @@ export class FrameEngine {
 
   // scroll progress goes through the timing table, which gives the video's dropped-frame jumps a little more scroll
   setTarget(progress) {
-    this.target = frameAt(progress);
+    const t = frameAt(progress);
+    if (t !== this.target) this.movedAt = performance.now();
+    this.target = t;
   }
 
   jump(progress) {
@@ -255,12 +257,15 @@ export class FrameEngine {
       }
     }
 
-    const diff = this.target - this.display;
+    // once the scroll has rested briefly, settle on the nearest whole frame so the still picture is crisp, never a blend of two
+    const resting = !this.reduced && performance.now() - (this.movedAt || 0) > 140;
+    const goal = resting ? Math.round(this.target) : this.target;
+    const diff = goal - this.display;
     if (Math.abs(diff) > 0.003) {
       this.dir = diff > 0 ? 1 : -1;
       this.display += this.reduced ? diff : diff * (1 - Math.exp(-dt * this.rate));
     } else if (diff !== 0) {
-      this.display = this.target;
+      this.display = goal;
     }
 
     const pos = clamp(this.display, 0, this.count - 1);
@@ -274,20 +279,24 @@ export class FrameEngine {
     }
 
     if (this.dirty || Math.abs(pos - this.drawnPos) > 0.004) {
-      const base = this.nearest(lo);
-      if (base >= 0 && (this.hasDrawn || base === lo) && Math.abs(base - lo) <= 4) {
+      const want = frac > 0.7 ? hi : lo;
+      const base = this.nearest(want);
+      if (base >= 0 && (this.hasDrawn || base === want) && Math.abs(base - want) <= 4) {
         // two neighbouring frames blended by the fractional position: motion stays continuous between the 240 stills
         this.ctx.globalAlpha = 1;
         this.ctx.drawImage(this.bitmaps.get(base), 0, 0);
         const top = this.bitmaps.get(hi);
-        if (base === lo && hi !== lo && frac > 0.01 && top) {
-          this.ctx.globalAlpha = frac;
+        // the blend happens only in the middle of the step, so a resting picture is one clean frame, never a double image
+        const mix = Math.min(1, Math.max(0, (frac - 0.3) / 0.4));
+        const blend = mix * mix * (3 - 2 * mix);
+        if (want === lo && base === lo && hi !== lo && blend > 0.01 && top) {
+          this.ctx.globalAlpha = blend;
           this.ctx.drawImage(top, 0, 0);
           this.ctx.globalAlpha = 1;
         }
-        this.drawn = base === lo ? cur : base;
-        this.drawnPos = base === lo && (top || frac <= 0.01) ? pos : -1;
-        this.dirty = base !== lo;
+        this.drawn = base === want ? cur : base;
+        this.drawnPos = base === want && (want === hi || top || blend <= 0.01) ? pos : -1;
+        this.dirty = base !== want;
         this.first();
       } else if (!this.hasDrawn || Math.abs(cur - this.drawn) > 30) {
         // a big jump (or the very first picture): show the right scene roughly, then sharpen as the real frames arrive
