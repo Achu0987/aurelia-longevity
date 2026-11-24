@@ -177,7 +177,8 @@ export default function Sequence({ children }) {
       },
       onTick: (p) => {
         seq.p = p;
-        engine.rate = 42; // follows the native scroll almost at once: only enough easing to smooth out coarse mouse-wheel steps
+        // Lenis already smooths the scroll, so the picture follows it tightly; touch scrolling gets a little easing.
+        engine.rate = seq.lenis ? 60 : 18;
         if (heroPhoto.current && p < 0.07) {
           heroPhoto.current.style.translate = `${(-pointer.x * 14).toFixed(1)}px ${(pointer.y * 8).toFixed(1)}px`;
         }
