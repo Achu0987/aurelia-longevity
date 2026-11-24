@@ -1,0 +1,146 @@
+/* Light, editorial sections that follow the film: statement, why, ways to begin, questions. */
+
+.cover { position: relative; z-index: 2; background: var(--pearl); color: var(--charcoal); }
+.cover--alt { background: var(--ivory); }
+
+/* ---- Statement ---- */
+.stmt { min-height: 92svh; display: grid; align-items: center; padding-block: var(--section); }
+.stmt__text { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.9rem, 4.6vw, 4.8rem); line-height: 1.16; letter-spacing: -0.012em; max-width: 26ch; text-wrap: pretty; }
+.stmt__w { --i: 0; opacity: clamp(0.18, calc(var(--p, 0) * var(--n, 10) * 1.25 - var(--i) + 1), 1); transition: opacity 240ms linear; }
+.stmt__chip { display: inline-block; width: 1.9em; height: 0.98em; border-radius: 999px; overflow: hidden; vertical-align: -0.12em; margin-inline: 0.1em; background: var(--charcoal); }
+.stmt__chip img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ---- Why Aurelia ---- */
+.why { padding-block: var(--section); }
+.why__head { display: grid; gap: 20px; max-width: 46rem; margin-bottom: clamp(40px, 6vw, 88px); }
+.why__head h2 { font-size: clamp(2rem, 4vw, 4.2rem); }
+.why__grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(32px, 7vw, 128px); align-items: start; }
+.why__media { position: sticky; top: 14svh; aspect-ratio: 4 / 5; max-height: 72svh; border-radius: 28px; overflow: hidden; background: var(--charcoal); }
+.why__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.06); transition: opacity 900ms var(--ease-out), transform 1800ms var(--ease-out); }
+.why__media img.is-on { opacity: 1; transform: none; }
+.why__rail { position: absolute; left: 18px; top: 50%; translate: 0 -50%; display: grid; gap: 12px; list-style: none; margin: 0; padding: 0; }
+.why__rail li { width: 8px; height: 8px; border-radius: 50%; background: color-mix(in oklab, #fff 50%, transparent); transition: height 420ms var(--ease-out), background-color 420ms; }
+.why__rail li.is-on { height: 30px; background: var(--champagne); }
+.why__steps { display: grid; }
+.why__step { min-height: 76svh; display: grid; align-content: center; gap: 22px; opacity: 0.32; transition: opacity 600ms var(--ease-out); }
+.why__step.is-on { opacity: 1; }
+.why__step h3 { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.8rem, 3.2vw, 3.2rem); line-height: 1.1; letter-spacing: -0.01em; }
+.why__step ul { display: grid; gap: 12px; list-style: none; }
+.why__step li { position: relative; padding-left: 30px; font-size: 1.0625rem; line-height: 1.45; }
+.why__step li::before { content: ""; position: absolute; left: 0; top: 0.35em; width: 14px; height: 14px; border-radius: 50%; background: var(--metal); }
+.why__still { display: none; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 20px; }
+
+/* ---- Ways to begin ---- */
+.ways { padding-block: var(--section); }
+.ways__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2vw, 28px); align-items: stretch; }
+.way { display: grid; align-content: start; gap: 18px; padding: clamp(24px, 2.6vw, 40px); border-radius: 28px; background: var(--ivory); }
+.way h3 { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.6rem, 2.2vw, 2.2rem); }
+.way__line { font-size: 1.0625rem; line-height: 1.45; min-height: 3em; }
+.way ul { display: grid; gap: 12px; list-style: none; margin-bottom: 8px; }
+.way li { position: relative; padding-left: 28px; font-size: 1rem; line-height: 1.45; }
+.way li::before { content: ""; position: absolute; left: 0; top: 0.4em; width: 12px; height: 12px; border-radius: 50%; background: var(--metal); }
+.way .btn { justify-self: start; margin-top: auto; }
+.way--feat { background: var(--charcoal); color: var(--on-dark); }
+.way--feat .way__line { color: var(--on-dark-2); }
+.ways__note { margin-top: 28px; font-size: 0.875rem; color: var(--ink-2); }
+
+/* ---- FAQ ---- */
+.faq { padding-block: var(--section); }
+.faq__grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(32px, 7vw, 128px); align-items: start; }
+.faq__intro { display: grid; gap: 24px; justify-items: start; position: sticky; top: 16svh; }
+.faq__intro h2 { font-size: clamp(2rem, 3.6vw, 3.8rem); }
+.faq__list { display: grid; gap: 10px; }
+.faq details { border-radius: 18px; background: color-mix(in oklab, #fff 62%, transparent); overflow: hidden; }
+.faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 22px 26px; font-family: var(--font-display); font-size: clamp(1.15rem, 1.5vw, 1.45rem); line-height: 1.25; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: ""; flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--metal) center / 14px 2px no-repeat, var(--metal); background-image: linear-gradient(var(--charcoal), var(--charcoal)), linear-gradient(var(--charcoal), var(--charcoal)); background-size: 14px 2px, 2px 14px; background-position: center; background-repeat: no-repeat; background-color: var(--champagne); transition: transform 420ms var(--ease-out); }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq details p { padding: 0 26px 24px; max-width: 62ch; color: var(--ink-2); animation: rise 520ms var(--ease-out); }
+.faq summary:hover { color: var(--champagne-deep); }
+
+/* ---- Hero banner photo (hands over to the film) ---- */
+.hero__bg { position: absolute; inset: 0; background: var(--charcoal); }
+/* a soft shade across the top keeps the navigation readable over any part of the photo */
+.hero__shade { position: absolute; left: 0; right: 0; top: 0; height: 180px; pointer-events: none; background: linear-gradient(180deg, color-mix(in oklab, var(--charcoal) 70%, transparent), transparent); }
+.hero__photo { position: absolute; top: 0; bottom: 0; left: 36%; width: 64%; height: 100%; object-fit: cover; object-position: 50% 90%; -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 22%); mask-image: linear-gradient(90deg, transparent 0%, #000 22%); animation: heroIn 2.8s var(--ease-out) both; will-change: opacity; }
+@keyframes heroIn { from { transform: scale(1.09); } to { transform: scale(1); } }
+.film__stage[data-tone="dark"] .seq__cue { color: var(--on-dark); }
+
+/* ---- Final section: a photo, and a calm invitation (opaque, so the story ends on people) ---- */
+.cover.begin { display: grid; align-items: stretch; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 100svh; padding: 0; background: var(--ivory); color: var(--charcoal); }
+.begin__photo { position: relative; margin: 0; min-height: 100svh; overflow: hidden; background: var(--charcoal); }
+.begin__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; }
+.begin__photo figcaption { position: absolute; left: clamp(24px, 4vw, 64px); top: clamp(110px, 14vh, 150px); right: 24px; font-size: clamp(1.8rem, 3.6vw, 3.8rem); color: #fff; text-shadow: 0 2px 24px color-mix(in oklab, #000 45%, transparent); }
+.begin__panel { display: grid; align-content: center; justify-items: start; gap: 28px; padding: clamp(36px, 6vw, 112px); background: oklch(88% 0.075 88); }
+.begin__panel h2 { font-size: clamp(2.1rem, 4.2vw, 4.6rem); max-width: 14ch; }
+.begin__panel .lead { max-width: 34ch; }
+.btn--dark { gap: 40px; justify-content: space-between; min-width: min(20rem, 100%); border-radius: 2px; background: var(--charcoal); color: var(--on-dark); border-color: var(--charcoal); }
+.btn--dark::before { display: none; }
+.btn--dark:hover, .btn--dark:focus-visible { color: var(--champagne); border-color: var(--charcoal); }
+.btn--dark svg { transition: transform 420ms var(--ease-out); }
+.btn--dark:hover svg { transform: translateX(5px); }
+.begin__panel .note-line { color: var(--ink-2); }
+
+@media (max-width: 900px) {
+  .cover.begin { grid-template-columns: minmax(0, 1fr); }
+  .begin__photo { min-height: 62svh; }
+  .why__grid, .faq__grid { grid-template-columns: minmax(0, 1fr); }
+  .why__media { display: none; }
+  .why__step { min-height: 0; padding-block: 36px; opacity: 1; }
+  .why__still { display: block; }
+  .ways__grid { grid-template-columns: minmax(0, 1fr); }
+  .way__line { min-height: 0; }
+  .faq__intro { position: static; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stmt__w { opacity: 1; transition: none; }
+  .why__media img { transition: none; }
+  .why__step { opacity: 1; }
+  .faq details p { animation: none; }
+}
+
+/* Phones: the hero photo fills the screen and the words sit in a panel at the bottom */
+@media (max-width: 800px) {
+  .hero__photo { left: 0; width: 100%; -webkit-mask-image: none; mask-image: none; object-position: 50% 75%; }
+  .hero__bg { display: none; }
+}
+
+/* Hero text stays in its own column, on two lines; the scroll cue moves to the right edge */
+.chap--hero h1 { max-width: 8.8em; }
+.seq__cue { left: auto; right: var(--gutter); translate: 0 0; }
+.film__stage .seq__cue { left: auto; right: var(--gutter); translate: 0 0; }
+
+
+/* ---- Callouts that ride on the object they explain (position is set from the frame, in JS) ---- */
+.note { --o: 0; --len: 60px; position: absolute; left: 0; top: 0; width: 0; height: 0; z-index: 3; opacity: 0; visibility: hidden; pointer-events: none; color: var(--on-dark); will-change: transform; }
+.note__ring { position: absolute; left: -9px; top: -9px; width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--champagne); background: color-mix(in oklab, var(--champagne) 35%, transparent); transform: scale(clamp(0, calc(var(--o) * 3), 1)); }
+.note::before { content: ""; position: absolute; left: 9px; top: -0.5px; height: 1px; width: var(--len); background: var(--champagne); transform-origin: left; transform: scaleX(clamp(0, calc(var(--o) * 2.4 - 0.2), 1)); }
+.note__body { position: absolute; left: calc(9px + var(--len)); top: 0; translate: 0 -50%; display: grid; gap: 2px; width: max-content; max-width: 250px; padding: 10px 14px; border-radius: 2px; background: color-mix(in oklab, var(--charcoal) 76%, transparent); font-size: 0.8125rem; line-height: 1.4; opacity: clamp(0, calc((var(--o) - 0.35) * 2.8), 1); transform: translateX(calc((1 - clamp(0, calc((var(--o) - 0.35) * 2.8), 1)) * -16px)); }
+.note__body strong { font-weight: 500; font-size: 0.875rem; color: var(--champagne); }
+/* a callout that rises above its object instead of sitting beside it */
+.note--top::before { left: -0.5px; top: auto; bottom: 9px; width: 1px; height: var(--len); transform-origin: bottom; transform: scaleY(clamp(0, calc(var(--o) * 2.4 - 0.2), 1)); }
+.note--top .note__body { left: 0; top: auto; bottom: calc(9px + var(--len)); translate: -50% 0; transform: translateY(calc((1 - clamp(0, calc((var(--o) - 0.35) * 2.8), 1)) * 12px)); }
+
+.note--flip::before { left: auto; right: 9px; transform-origin: right; }
+.note--flip .note__body { left: auto; right: calc(9px + var(--len)); transform: translateX(calc((1 - clamp(0, calc((var(--o) - 0.35) * 2.8), 1)) * 16px)); }
+
+/* ---- Scan readout and care-approach panels, shown on the stage during their chapters ---- */
+.hud { --o: 0; --w: 0; position: absolute; z-index: 3; right: var(--gutter); bottom: 44px; width: 15.5rem; padding: 14px 16px 12px; display: grid; gap: 10px; border-radius: 2px; background: color-mix(in oklab, var(--charcoal) 72%, transparent); border: 1px solid color-mix(in oklab, var(--champagne) 28%, transparent); color: var(--on-dark); opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(calc((1 - var(--o)) * 14px)); }
+.hud__title { font-size: 0.6875rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--champagne); }
+.hud ul, .hud ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
+.hud li { --f: clamp(0, calc((var(--w) - var(--t)) * 4), 1); display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; font-size: 0.8125rem; opacity: calc(0.35 + var(--f) * 0.65); }
+.hud li em { font-style: normal; color: var(--champagne); opacity: var(--f); }
+.hud li > i { grid-column: 1 / -1; height: 2px; background: color-mix(in oklab, var(--on-dark) 16%, transparent); position: relative; overflow: hidden; }
+.hud li > i::after { content: ""; position: absolute; inset: 0; background: var(--champagne); transform-origin: left; transform: scaleX(var(--f)); }
+.hud__fine { font-size: 0.6875rem; line-height: 1.4; color: var(--on-dark-2); }
+.hud--stages ol { gap: 12px; }
+.hud--stages li { grid-template-columns: auto 1fr; align-items: start; gap: 12px; }
+.hud--stages b { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--champagne); font-weight: 500; font-size: 0.75rem; color: var(--champagne); background: color-mix(in oklab, var(--champagne) calc(var(--f) * 38%), transparent); }
+.hud--stages li span { display: grid; gap: 1px; line-height: 1.35; color: var(--on-dark-2); }
+.hud--stages li strong { font-weight: 500; color: var(--on-dark); }
+@media (max-width: 1100px), (max-height: 720px) { .hud { display: none; } }
+
+/* ---- Final call to action: the slow helix ---- */
+.begin__panel { position: relative; }
+.begin__helix { position: absolute; right: clamp(8px, 2vw, 36px); top: clamp(88px, 12vh, 140px); width: clamp(120px, 14vw, 220px); height: clamp(220px, 34vh, 380px); pointer-events: none; opacity: 0.9; }
+@media (max-width: 900px) { .begin__helix { top: 16px; height: 200px; width: 120px; } }
