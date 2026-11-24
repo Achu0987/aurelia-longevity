@@ -237,7 +237,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   .nav__toggle { display: block; }
   .nav .btn--nav { display: none; }
 }
-@media (max-width: 800px) {
+@media (max-width: 800px), (max-width: 1100px) and (orientation: portrait) {
   .seq { height: 900svh; }
   .steps { display: none; }
   .scan__label { right: var(--gutter); }

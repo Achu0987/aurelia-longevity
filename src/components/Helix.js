@@ -26,6 +26,8 @@ export default function Helix({ className = "" }) {
 
     const group = new THREE.Group();
     scene.add(group);
+    const spin = new THREE.Group();
+    group.add(spin);
     const N = 44;
     const H = 9;
     const R = 1.25;
@@ -49,12 +51,12 @@ export default function Helix({ className = "" }) {
       m1.position.copy(a[i]);
       const m2 = new THREE.Mesh(dotGeo, dotB);
       m2.position.copy(b[i]);
-      group.add(m1, m2);
+      spin.add(m1, m2);
     }
     const rungPts = [];
     for (let i = 1; i < N - 1; i += 2) rungPts.push(a[i], b[i]);
     const rungs = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(rungPts), new THREE.LineBasicMaterial({ color: gold, transparent: true, opacity: 0.55 }));
-    group.add(rungs);
+    spin.add(rungs);
     group.rotation.z = 0.32;
 
     const fit = () => {
@@ -64,6 +66,10 @@ export default function Helix({ className = "" }) {
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
+      // a wide canvas (phones) shows the helix lying on its side, filling the band
+      const wide = w / h > 1.4;
+      group.rotation.z = wide ? Math.PI / 2 + 0.08 : 0.32;
+      camera.position.z = wide ? 9.5 * Math.max(1, 3.2 / (w / h)) : 15;
     };
     fit();
     const ro = new ResizeObserver(() => {
@@ -84,7 +90,8 @@ export default function Helix({ className = "" }) {
       last = now;
       t += reduced ? 0 : dt;
       lean += (pointer.x * 0.35 - lean) * 0.05;
-      group.rotation.y = t * 0.45 + lean;
+      spin.rotation.y = t * 0.45;
+      group.rotation.x = lean * 0.5;
       renderer.render(scene, camera);
     };
     const io = new IntersectionObserver(([e]) => {
