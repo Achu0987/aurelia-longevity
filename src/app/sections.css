@@ -164,3 +164,7 @@
   .seq__scrim--light { background: linear-gradient(90deg, color-mix(in oklab, var(--ivory) 90%, transparent) 0%, color-mix(in oklab, var(--ivory) 78%, transparent) 42%, color-mix(in oklab, var(--ivory) 30%, transparent) 64%, transparent 82%); }
   .seq__scrim--dark { background: linear-gradient(90deg, color-mix(in oklab, var(--charcoal) 74%, transparent) 0%, color-mix(in oklab, var(--charcoal) 55%, transparent) 42%, transparent 78%); }
 }
+
+/* ---- The film as a framed screen: full-bleed in the hero, it settles into a rounded cinema frame as the journey begins (scale set in JS) ---- */
+@media (max-width: 800px) { .film__stage { --frame: 8px; --frame-r: 20px; } }
+@media (prefers-reduced-motion: reduce) { .film__stage { box-shadow: none; transform: none !important; border-radius: 0 !important; } }

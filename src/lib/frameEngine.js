@@ -53,8 +53,8 @@ export class FrameEngine {
     this.scale = 1; // drops to 0.72 if this device cannot keep up
     this.slow = 0;
     this.lowPower = false;
-    this.ahead = 18;
-    this.behind = 6;
+    this.ahead = 16;
+    this.behind = 10; // scrolling back up is as ready as scrolling down
     this.drawnPos = -1; // the fractional position last painted (two frames cross-faded)
 
     // Load order: opening frames, a coarse pass every 6th frame, then everything else in sequence.
@@ -147,7 +147,7 @@ export class FrameEngine {
         .then((bmp) => {
           if (this.dead || gen !== this.gen) return bmp.close();
           this.bitmaps.set(i, bmp);
-          if (Math.abs(i - this.display) < 3) this.dirty = true;
+          if (Math.abs(i - this.display) < 2) this.dirty = true;
         })
         .catch((e) => console.warn("frame decode failed", i, e && e.message))
         .finally(() => {
@@ -163,7 +163,7 @@ export class FrameEngine {
     const gen = this.gen;
     this.coarseBusy.add(key);
     try {
-      const bmp = await this.decodeFor(this.blobs[i], 0.5);
+      const bmp = await this.decodeFor(this.blobs[i], Math.min(0.5, 560 / this.canvas.width));
       if (this.dead || gen !== this.gen) bmp.close();
       else this.coarse.set(i, bmp);
     } catch (e) {
@@ -228,21 +228,16 @@ export class FrameEngine {
     this.dirty = true;
   }
 
-  // the decoded frame nearest to i (within a few frames), so the picture never freezes while a decode catches up
-  nearest(i, reach = 4) {
-    if (this.bitmaps.has(i)) return i;
-    for (let k = 1; k <= reach; k++) {
-      const a = i - k * this.dir;
-      const b = i + k * this.dir;
-      if (this.bitmaps.has(a)) return a;
-      if (this.bitmaps.has(b)) return b;
-    }
-    return -1;
-  }
-
   // Call once per animation tick (time in milliseconds).
   step(t) {
-    if (this.dead || !this.visible) return;
+    if (this.dead) return;
+    if (!this.visible) {
+      // while a section covers the film, keep the picture in step with the scroll, so it never rewinds on screen when uncovered
+      this.display = this.target;
+      this.dirty = true;
+      this.last = t;
+      return;
+    }
     const raw = (t - this.last) / 1000 || 0.016;
     const dt = Math.min(0.05, raw);
     this.last = t;
@@ -273,35 +268,57 @@ export class FrameEngine {
     const frac = pos - lo;
     const cur = frac < 0.5 ? lo : hi;
     if (cur !== this.drawn || this.dirty || this.pending.length || this.inflight.size === 0) this.plan(cur);
-    if (this.coarse.size < Math.ceil(this.count / 10)) {
-      for (let i = 0; i < this.count; i += 10) this.decodeCoarse(i);
+    // a light preview of every frame, nearest the playhead first, so any frame can be shown the moment it is reached
+    if (this.coarse.size < this.count) {
+      for (let k = 0; k < this.count && this.coarseBusy.size < 2; k++) {
+        const a = cur + k;
+        const b = cur - k;
+        if (a < this.count) this.decodeCoarse(a);
+        if (k && b >= 0) this.decodeCoarse(b);
+      }
     }
 
     if (this.dirty || Math.abs(pos - this.drawnPos) > 0.004) {
       const want = frac > 0.65 ? hi : lo;
-      const base = this.nearest(want);
-      if (base >= 0 && (this.hasDrawn || base === want) && Math.abs(base - want) <= 4) {
-        // two neighbouring frames blended by the fractional position: motion stays continuous between the 240 stills
+      const mix = Math.min(1, Math.max(0, (frac - 0.35) / 0.3));
+      const blend = want === lo && hi !== lo ? mix * mix * (3 - 2 * mix) : 0; // blend only mid-step, so a resting picture is one clean frame
+      const W = this.canvas.width;
+      const H = this.canvas.height;
+      const exact = this.bitmaps.get(want);
+      const preview = this.coarse.get(want);
+      if (exact) {
+        // the sharp frame, 1:1, cross-faded into the next one by the fractional position
         this.ctx.globalAlpha = 1;
-        this.ctx.drawImage(this.bitmaps.get(base), 0, 0);
-        const top = this.bitmaps.get(hi);
-        // the blend happens only in the middle of the step, so a resting picture is one clean frame, never a double image
-        const mix = Math.min(1, Math.max(0, (frac - 0.35) / 0.3));
-        const blend = mix * mix * (3 - 2 * mix);
-        if (want === lo && base === lo && hi !== lo && blend > 0.01 && top) {
+        this.ctx.drawImage(exact, 0, 0);
+        const top = blend > 0.01 ? this.bitmaps.get(hi) || this.coarse.get(hi) : null;
+        if (top) {
           this.ctx.globalAlpha = blend;
-          this.ctx.drawImage(top, 0, 0);
+          this.ctx.drawImage(top, 0, 0, W, H);
           this.ctx.globalAlpha = 1;
         }
-        this.drawn = base === want ? cur : base;
-        this.drawnPos = base === want && (want === hi || top || blend <= 0.01) ? pos : -1;
-        this.dirty = base !== want;
+        this.drawn = cur;
+        this.drawnPos = pos;
+        this.dirty = false;
+        this.first();
+      } else if (preview) {
+        // always the right frame: its light preview, sharpened as soon as the full frame is decoded (the decoder marks it dirty)
+        this.ctx.globalAlpha = 1;
+        this.ctx.drawImage(preview, 0, 0, W, H);
+        const top = blend > 0.01 ? this.coarse.get(hi) : null;
+        if (top) {
+          this.ctx.globalAlpha = blend;
+          this.ctx.drawImage(top, 0, 0, W, H);
+          this.ctx.globalAlpha = 1;
+        }
+        this.drawn = cur;
+        this.drawnPos = pos;
+        this.dirty = false;
         this.first();
       } else if (!this.hasDrawn || Math.abs(cur - this.drawn) > 30) {
-        // a big jump (or the very first picture): show the right scene roughly, then sharpen as the real frames arrive
+        // only before the previews exist: the nearest scene, roughly
         const c = this.coarseNearest(cur);
         if (c) {
-          this.ctx.drawImage(c, 0, 0, this.canvas.width, this.canvas.height);
+          this.ctx.drawImage(c, 0, 0, W, H);
           this.drawn = cur;
           this.drawnPos = -1;
           this.dirty = true;

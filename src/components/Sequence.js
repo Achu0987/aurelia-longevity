@@ -65,10 +65,21 @@ export default function Sequence({ children }) {
     const stepsNav = st.querySelector(".steps");
     const noteEls = Array.from(st.querySelectorAll(".note"));
     const size = { w: st.clientWidth, h: st.clientHeight };
+    // how much the framed screen must grow to fill the window edge to edge (the hero is full-bleed)
+    const frame = { scale: 1, radius: 0 };
+    const measureFrame = () => {
+      const cs = getComputedStyle(st);
+      const f = parseFloat(cs.getPropertyValue("--frame")) || 0;
+      frame.radius = parseFloat(cs.getPropertyValue("--frame-r")) || 0;
+      frame.scale = Math.max((size.w + 2 * f) / size.w, (size.h + 2 * f) / size.h);
+      st._fk = "";
+    };
     const sizeRO = new ResizeObserver(() => {
       size.w = st.clientWidth;
       size.h = st.clientHeight;
+      measureFrame();
     });
+    measureFrame();
     sizeRO.observe(st);
     let activeStep = -1;
     let particles = null;
@@ -106,6 +117,15 @@ export default function Sequence({ children }) {
       if (heroShade.current) {
         heroShade.current.style.opacity = hp.toFixed(3);
         heroShade.current.style.visibility = hp < 0.01 ? "hidden" : "visible";
+      }
+      // full-bleed in the hero, then the film settles into its rounded frame as the journey begins
+      const open = clamp01((p - 0.03) / 0.05);
+      const eased = open * open * (3 - 2 * open);
+      const frameKey = (1 + (frame.scale - 1) * (1 - eased)).toFixed(4);
+      if (st._fk !== frameKey) {
+        st._fk = frameKey;
+        st.style.transform = `scale(${frameKey})`;
+        st.style.borderRadius = `${(frame.radius * eased).toFixed(1)}px`;
       }
       const dark = p > DARK_FROM || hp > 0.02;
       seq.tone = dark ? "dark" : "light";

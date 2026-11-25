@@ -16,36 +16,24 @@ export default function Nav() {
   const [solid, setSolid] = useState(false);
   const below = useRef(null); // tone of the section under the bar once we leave the cinematic stage
 
-  // The bar takes the tone of whatever is under it. No hit-testing: an observer watches the sections below the stage,
-  // and the stage reports its own tone.
+  // The bar takes the tone of whatever is under it, read from the real scroll position every 100 ms, so it is right after any jump,
+  // fast scroll or back-navigation (no observers that can miss an update).
   useEffect(() => {
     const sections = Array.from(document.querySelectorAll("[data-flow]"));
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) if (e.isIntersecting) below.current = e.target.dataset.tone;
-      },
-      { rootMargin: "0px 0px -94% 0px" },
-    );
-    sections.forEach((s) => io.observe(s));
-    const stage = document.querySelector(".seq");
-    const io2 = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting && e.boundingClientRect.top <= 0 && e.boundingClientRect.bottom > 80) below.current = null;
-      },
-      { threshold: [0, 0.02, 0.5, 1] },
-    );
-    if (stage) io2.observe(stage);
     const t = setInterval(() => {
+      const y = 44; // the middle of the bar
+      const under = sections.find((s) => {
+        const r = s.getBoundingClientRect();
+        return r.top <= y && r.bottom > y;
+      });
+      below.current = under ? under.dataset.tone : null;
       const next = below.current || seq.tone;
       setTone((cur) => (cur === next ? cur : next));
-      const s = seq.p > 0.03 || seq.extra > 0 || below.current !== null;
+      const heroEnd = seq.trackTop + 0.03 * Math.max(1, seq.trackHeight - window.innerHeight);
+      const s = window.scrollY > heroEnd || below.current !== null;
       setSolid((cur) => (cur === s ? cur : s));
     }, 100);
-    return () => {
-      clearInterval(t);
-      io.disconnect();
-      io2.disconnect();
-    };
+    return () => clearInterval(t);
   }, []);
 
   const run = (fn) => () => {
@@ -69,6 +57,9 @@ export default function Nav() {
               {l.label}
             </button>
           ))}
+          <button type="button" className="nav__cta-m" onClick={run(() => goToId("begin"))}>
+            Private enquiry
+          </button>
         </nav>
         <button className="btn btn--gold btn--nav" type="button" onClick={() => goToId("begin")}>
           Private enquiry

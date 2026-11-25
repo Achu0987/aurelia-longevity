@@ -81,7 +81,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   color: var(--fg); background: transparent; border: 1px solid transparent;
   transition: background-color 600ms var(--ease-out), border-color 600ms var(--ease-out), color 600ms var(--ease-out);
 }
-.nav[data-solid="true"] .nav__bar { max-width: 1240px; background: color-mix(in oklab, var(--pearl) 84%, transparent); border-color: color-mix(in oklab, #fff 80%, transparent); }
+.nav[data-solid="true"] .nav__bar { max-width: 1240px; background: color-mix(in oklab, var(--pearl) 88%, transparent); border-color: color-mix(in oklab, #fff 80%, transparent); -webkit-backdrop-filter: blur(16px) saturate(1.2); backdrop-filter: blur(16px) saturate(1.2); box-shadow: 0 10px 30px -18px color-mix(in oklab, var(--charcoal) 45%, transparent); }
 .nav[data-solid="true"][data-nav-tone="dark"] .nav__bar { background: color-mix(in oklab, var(--charcoal) 78%, transparent); border-color: color-mix(in oklab, var(--on-dark) 16%, transparent); }
 .nav__brand { display: flex; align-items: center; gap: 12px; text-decoration: none; font-family: var(--font-display); font-weight: 400; font-size: 1.2rem; letter-spacing: 0.32em; text-transform: uppercase; }
 .nav__mark { color: var(--champagne-deep); flex: none; }
@@ -93,6 +93,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .nav__links button:hover::after, .nav__links button:focus-visible::after { transform: scaleX(1); }
 .nav .btn--nav { min-height: 44px; padding-inline: 26px; margin-left: auto; }
 .nav__links + .btn--nav { margin-left: 0; }
+.nav .nav__cta-m { display: none; }
 .nav__toggle { display: none; width: 44px; height: 44px; position: relative; margin-left: auto; }
 .nav__toggle span { position: absolute; left: 10px; right: 10px; height: 1.5px; background: currentColor; transition: transform 360ms var(--ease-out), top 360ms var(--ease-out); }
 .nav__toggle span:first-child { top: 17px; }
@@ -106,7 +107,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 [data-flow] { position: relative; z-index: 2; }
 .film__veil { position: absolute; inset: 0; background: var(--charcoal); opacity: 0; pointer-events: none; }
 /* The stage is fixed, not sticky: a fixed layer is held by the compositor, so it cannot judder while the page is scrolled by script. */
-.film__stage { position: fixed; inset: 0; z-index: 0; height: 100svh; overflow: clip; background: var(--charcoal); isolation: isolate; }
+.film__stage { --frame: 14px; --frame-r: 28px; position: fixed; top: var(--frame); left: var(--frame); right: var(--frame); z-index: 0; height: calc(100svh - 2 * var(--frame)); overflow: clip; background: var(--charcoal); isolation: isolate; transform-origin: 50% 50%; will-change: transform; box-shadow: 0 0 0 1px color-mix(in oklab, var(--champagne) 26%, transparent), 0 40px 90px -30px #000; }
 .seq__poster, .seq__canvas, .seq__fx, .seq__scrim { position: absolute; inset: 0; width: 100%; height: 100%; }
 .seq__poster { object-fit: cover; }
 .seq__canvas { will-change: transform, opacity; transform-origin: 50% 50%; opacity: 0; transition: opacity 500ms linear; }
@@ -235,6 +236,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   .nav__links.is-open { opacity: 1; visibility: visible; transform: none; }
   .nav__links button { text-align: left; padding-block: 14px; }
   .nav__toggle { display: block; }
+  .nav .nav__links .nav__cta-m { display: block; margin-top: 10px; padding: 14px 20px; border-radius: 999px; text-align: center; background: var(--metal); color: var(--charcoal); font-size: 0.95rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  .nav .nav__links .nav__cta-m::after { display: none; }
   .nav .btn--nav { display: none; }
 }
 @media (max-width: 800px), (max-width: 1100px) and (orientation: portrait) {
