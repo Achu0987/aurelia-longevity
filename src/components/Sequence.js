@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { FrameEngine } from "@/lib/frameEngine";
-import { seq, pointer, goToProgress } from "@/lib/state";
+import { seq, goToProgress } from "@/lib/state";
 import { CHAPTERS, NOTES, DARK_FROM, STEPS, SCAN, notePoint } from "@/lib/chapters";
 import { createParticles } from "@/components/particles";
 import { asset } from "@/lib/asset";
@@ -86,6 +86,29 @@ export default function Sequence({ children }) {
     st.style.transform = `scale(${frame.scale.toFixed(4)})`;
     st.style.borderRadius = "0px";
     sizeRO.observe(st);
+
+    // hero photo: it never drifts with the mouse; resting the pointer on the family slowly leans the picture in
+    // (desktop mouse only; the CSS transition does the easing, so this only flips a class)
+    const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    let heroZoom = false;
+    const setHeroZoom = (on) => {
+      if (on === heroZoom || !heroPhoto.current) return;
+      heroZoom = on;
+      heroPhoto.current.classList.toggle("is-zoom", on);
+    };
+    const onHeroMove = (e) => {
+      const img = heroPhoto.current;
+      if (!img || lastP > 0.025) return setHeroZoom(false);
+      const r = img.getBoundingClientRect();
+      // the left of the photo fades into the dark behind the headline, so only the visible picture counts
+      const over = e.clientX >= r.left + r.width * 0.22 && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      setHeroZoom(over && !e.target.closest?.(".nav"));
+    };
+    const onHeroLeave = () => setHeroZoom(false);
+    if (canHover) {
+      window.addEventListener("pointermove", onHeroMove, { passive: true });
+      document.documentElement.addEventListener("mouseleave", onHeroLeave);
+    }
     let activeStep = -1;
     let particles = null;
     let lastP = -1;
@@ -115,6 +138,7 @@ export default function Sequence({ children }) {
         heroPhoto.current.style.opacity = hp.toFixed(3);
         heroPhoto.current.style.visibility = hp < 0.01 ? "hidden" : "visible";
       }
+      if (p > 0.025) setHeroZoom(false);
       if (heroBg.current) {
         heroBg.current.style.opacity = hp.toFixed(3);
         heroBg.current.style.visibility = hp < 0.01 ? "hidden" : "visible";
@@ -204,9 +228,6 @@ export default function Sequence({ children }) {
         seq.p = p;
         // Lenis already smooths the scroll, so the picture follows it tightly; touch scrolling gets a little easing.
         engine.rate = seq.lenis ? 60 : 18;
-        if (heroPhoto.current && p < 0.07) {
-          heroPhoto.current.style.translate = `${(-pointer.x * 14).toFixed(1)}px ${(pointer.y * 8).toFixed(1)}px`;
-        }
         const introActive = intro < 1;
         if (introActive) intro = easeOut(clamp01((performance.now() - introStart) / 2400));
         if (Math.abs(p - lastP) > 0.00002 || introActive || seq.extra !== lastExtra) {
@@ -291,6 +312,8 @@ export default function Sequence({ children }) {
 
     return () => {
       window.removeEventListener("resize", onResize);
+      window.removeEventListener("pointermove", onHeroMove);
+      document.documentElement.removeEventListener("mouseleave", onHeroLeave);
       (window.cancelIdleCallback || clearTimeout)(idleId);
       ro.disconnect();
       gsap.ticker.remove(tick);
