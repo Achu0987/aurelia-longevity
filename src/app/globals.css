@@ -175,7 +175,11 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 
 
 /* Right-edge stepper: where we are in the journey */
-.steps { position: absolute; z-index: 4; right: var(--gutter); top: 50%; translate: 0 -50%; display: grid; gap: 4px; justify-items: end; color: var(--charcoal); transition: color 600ms var(--ease-out); }
+/* before the script takes over: edge to edge, exactly how the hero looks once it runs */
+@media (prefers-reduced-motion: no-preference) {
+  .film__stage:not([data-framed]) { top: 0; left: 0; right: 0; height: 100svh; box-shadow: none; }
+}
+.steps { opacity: 0; position: absolute; z-index: 4; right: var(--gutter); top: 50%; translate: 0 -50%; display: grid; gap: 4px; justify-items: end; color: var(--charcoal); transition: color 600ms var(--ease-out); }
 .film__stage[data-tone="dark"] .steps { color: var(--on-dark); }
 .steps__btn { display: flex; align-items: center; gap: 12px; padding: 7px 0; font-size: 0.8125rem; opacity: 0.5; transition: opacity 420ms var(--ease-out), gap 420ms var(--ease-out); }
 .steps__btn i { display: block; width: 18px; height: 2px; background: currentColor; transition: width 520ms var(--ease-out), background-color 420ms; }

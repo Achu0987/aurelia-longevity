@@ -64,6 +64,9 @@ export default function Sequence({ children }) {
     const stepEls = Array.from(st.querySelectorAll("[data-step]"));
     const stepsNav = st.querySelector(".steps");
     const noteEls = Array.from(st.querySelectorAll(".note"));
+    // the stage is full-bleed until this runs (so the first paint is never the small framed box); switch to the
+    // framed geometry now, then measure it and scale it straight back up to full-bleed in the same frame
+    st.dataset.framed = "1";
     const size = { w: st.clientWidth, h: st.clientHeight };
     // how much the framed screen must grow to fill the window edge to edge (the hero is full-bleed)
     const frame = { scale: 1, radius: 0 };
@@ -80,6 +83,8 @@ export default function Sequence({ children }) {
       measureFrame();
     });
     measureFrame();
+    st.style.transform = `scale(${frame.scale.toFixed(4)})`;
+    st.style.borderRadius = "0px";
     sizeRO.observe(st);
     let activeStep = -1;
     let particles = null;
